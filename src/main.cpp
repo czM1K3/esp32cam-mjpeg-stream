@@ -24,22 +24,7 @@
 #include "soc/rtc_cntl_reg.h" //disable brownout problems
 #include "esp_http_server.h"
 #include "Arduino.h"
-
-//#define EnableSerial
-
-//Replace with your network credentials
-char ssid[] = "SSID";
-const char *password = "Password";
-
-#define PART_BOUNDARY "123456789000000000000987654321"
-
-// This project was tested with the AI Thinker Model, M5STACK PSRAM Model and M5STACK WITHOUT PSRAM
-#define CAMERA_MODEL_AI_THINKER
-//#define CAMERA_MODEL_M5STACK_PSRAM
-//#define CAMERA_MODEL_M5STACK_WITHOUT_PSRAM
-
-// Not tested with this model
-//#define CAMERA_MODEL_WROVER_KIT
+#include "configuration.h"
 
 #if defined(CAMERA_MODEL_WROVER_KIT)
 #define PWDN_GPIO_NUM -1
@@ -145,7 +130,7 @@ static esp_err_t stream_handler(httpd_req_t *req)
     fb = esp_camera_fb_get();
     if (!fb)
     {
-#ifdef EnableSerial
+#ifdef EnableDebug
       Serial.println("Camera capture failed");
 #endif
       res = ESP_FAIL;
@@ -161,7 +146,7 @@ static esp_err_t stream_handler(httpd_req_t *req)
           fb = NULL;
           if (!jpeg_converted)
           {
-#ifdef EnableSerial
+#ifdef EnableDebug
             Serial.println("JPEG compression failed");
 #endif
             res = ESP_FAIL;
@@ -202,7 +187,7 @@ static esp_err_t stream_handler(httpd_req_t *req)
     {
       break;
     }
-#ifdef EnableSerial
+#ifdef EnableDebug
     Serial.printf("MJPG: %uB\n", (uint32_t)(_jpg_buf_len));
 #endif
   }
@@ -220,7 +205,7 @@ void startCameraServer()
       .handler = stream_handler,
       .user_ctx = NULL};
 
-#ifdef EnableSerial
+#ifdef EnableDebug
   Serial.printf("Starting web server on port: '%d'\n", config.server_port);
 #endif
   if (httpd_start(&stream_httpd, &config) == ESP_OK)
@@ -233,7 +218,7 @@ void setup()
 {
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector
 
-#ifdef EnableSerial
+#ifdef EnableDebug
   Serial.begin(9600);
   Serial.setDebugOutput(false);
 #endif
@@ -268,7 +253,7 @@ void setup()
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK)
   {
-#ifdef EnableSerial
+#ifdef EnableDebug
     Serial.printf("Camera init failed with error 0x%x", err);
 #endif
     return;
@@ -278,11 +263,11 @@ void setup()
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
-#ifdef EnableSerial
+#ifdef EnableDebug
     Serial.print(".");
 #endif
   }
-#ifdef EnableSerial
+#ifdef EnableDebug
   Serial.println("");
   Serial.println("WiFi connected");
 
