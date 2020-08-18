@@ -1,15 +1,26 @@
+// Enable for debug inforamtions over serial monitor
 //#define EnableDebug
 
-//Replace with your network credentials
+// WiFi settings
 char ssid[] = "SSID";
 const char *password = "Password";
 
-#define PART_BOUNDARY "123456789000000000000987654321"
-
-// This project was tested with the AI Thinker Model, M5STACK PSRAM Model and M5STACK WITHOUT PSRAM
-#define CAMERA_MODEL_AI_THINKER
+// Select your ESP model
+//#define CAMERA_MODEL_AI_THINKER
 //#define CAMERA_MODEL_M5STACK_PSRAM
 //#define CAMERA_MODEL_M5STACK_WITHOUT_PSRAM
+//#define CAMERA_MODEL_WROVER_KIT // Not tested with this model
 
-// Not tested with this model
-//#define CAMERA_MODEL_WROVER_KIT
+// Select resolutino of stream
+//#define resolution FRAMESIZE_QQVGA;    // 160x120
+//#define resolution FRAMESIZE_QQVGA2;   // 128x160
+//#define resolution FRAMESIZE_QCIF;     // 176x144
+//#define resolution FRAMESIZE_HQVGA;    // 240x176
+//#define resolution FRAMESIZE_QVGA;     // 320x240
+//#define resolution FRAMESIZE_CIF;      // 400x296
+//#define resolution FRAMESIZE_VGA;      // 640x480
+//#define resolution FRAMESIZE_SVGA;     // 800x600
+//#define resolution FRAMESIZE_XGA;      // 1024x768
+//#define resolution FRAMESIZE_SXGA;     // 1280x1024
+//#define resolution FRAMESIZE_UXGA;     // 1600x1200
+//#define resolution FRAMESIZE_QXGA;     // 2048*1536

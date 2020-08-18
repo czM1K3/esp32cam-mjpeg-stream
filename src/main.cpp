@@ -26,6 +26,8 @@
 #include "Arduino.h"
 #include "configuration.h"
 
+#define PART_BOUNDARY "123456789000000000000987654321"
+
 #if defined(CAMERA_MODEL_WROVER_KIT)
 #define PWDN_GPIO_NUM -1
 #define RESET_GPIO_NUM -1
@@ -245,7 +247,7 @@ void setup()
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
 
-  config.frame_size = FRAMESIZE_SVGA;
+  config.frame_size = resolution;
   config.jpeg_quality = 7;
   config.fb_count = 2;
 
