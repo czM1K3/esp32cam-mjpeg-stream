@@ -2,7 +2,7 @@
 //#define EnableDebug
 
 // WiFi settings
-char ssid[] = "";
+char ssid[] = "SSID";
 const char *password = "Password";
 
 // Select your ESP model
