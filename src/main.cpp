@@ -103,6 +103,7 @@
 #define VSYNC_GPIO_NUM 25
 #define HREF_GPIO_NUM 23
 #define PCLK_GPIO_NUM 22
+#define FLASHLIGHT 4
 #else
 #warning "Camera model is not selected. Selecting AI_THINKER"
 #define PWDN_GPIO_NUM 32
@@ -122,6 +123,7 @@
 #define VSYNC_GPIO_NUM 25
 #define HREF_GPIO_NUM 23
 #define PCLK_GPIO_NUM 22
+#define FLASHLIGHT 4
 #endif
 
 static const char *_STREAM_CONTENT_TYPE = "multipart/x-mixed-replace;boundary=" PART_BOUNDARY;
@@ -129,6 +131,8 @@ static const char *_STREAM_BOUNDARY = "\r\n--" PART_BOUNDARY "\r\n";
 static const char *_STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n";
 
 httpd_handle_t stream_httpd = NULL;
+
+bool flashlight = false;
 
 static esp_err_t stream_handler(httpd_req_t *req)
 {
@@ -213,6 +217,33 @@ static esp_err_t stream_handler(httpd_req_t *req)
   return res;
 }
 
+#ifdef FLASHLIGHT
+static esp_err_t flash_handler(httpd_req_t *req)
+{
+  esp_err_t res = ESP_OK;
+  res = httpd_resp_set_type(req, _STREAM_CONTENT_TYPE);
+  if (res != ESP_OK)
+  {
+    return res;
+  }
+
+  if (flashlight)
+  {
+    digitalWrite(FLASHLIGHT, LOW);
+    const char resp[] = "Flash turned off";
+    httpd_resp_send(req, resp, -1);
+  }
+  else
+  {
+    digitalWrite(FLASHLIGHT, HIGH);
+    const char resp[] = "Flash turned on";
+    httpd_resp_send(req, resp, -1);
+  }
+  flashlight = !flashlight;
+  return res;
+}
+#endif
+
 void startCameraServer()
 {
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
@@ -224,12 +255,23 @@ void startCameraServer()
       .handler = stream_handler,
       .user_ctx = NULL};
 
+#ifdef FLASHLIGHT
+  httpd_uri_t light_uri = {
+      .uri = "/flash",
+      .method = HTTP_GET,
+      .handler = flash_handler,
+      .user_ctx = NULL};
+#endif
+
 #ifdef EnableDebug
   Serial.printf("Starting web server on port: '%d'\n", config.server_port);
 #endif
   if (httpd_start(&stream_httpd, &config) == ESP_OK)
   {
     httpd_register_uri_handler(stream_httpd, &index_uri);
+#ifdef FLASHLIGHT
+    httpd_register_uri_handler(stream_httpd, &light_uri);
+#endif
   }
 }
 
@@ -263,6 +305,10 @@ void setup()
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
+
+#ifdef FLASHLIGHT
+  pinMode(FLASHLIGHT, OUTPUT);
+#endif
 
 #ifndef resolution
 #warning "Resolution is not selected. Using SVGA (800x600)."
